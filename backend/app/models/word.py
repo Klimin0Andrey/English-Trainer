@@ -5,9 +5,11 @@ from sqlalchemy import String, ForeignKey, JSON, Integer, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.models.category import word_category  # импортируем таблицу связи
 
 if TYPE_CHECKING:
     from app.models.user import User
+    from app.models.category import Category
 
 
 class Word(Base):
@@ -26,12 +28,16 @@ class Word(Base):
     )
 
     # Поля для интервального повторения
-    strength: Mapped[int] = mapped_column(Integer, default=0)  # 0-100%
-    interval_days: Mapped[int] = mapped_column(Integer, default=1)  # текущий интервал в днях
-    next_review: Mapped[datetime] = mapped_column(DateTime, nullable=True)  # дата следующего повторения
+    strength: Mapped[int] = mapped_column(Integer, default=0)
+    interval_days: Mapped[int] = mapped_column(Integer, default=1)
+    next_review: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     last_review: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     review_count: Mapped[int] = mapped_column(Integer, default=0)
     correct_count: Mapped[int] = mapped_column(Integer, default=0)
     wrong_count: Mapped[int] = mapped_column(Integer, default=0)
 
     user: Mapped["User"] = relationship(back_populates="words")
+    categories: Mapped[list["Category"]] = relationship(
+        secondary=word_category,
+        back_populates="words"
+    )

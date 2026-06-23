@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
+from app.schemas.category import CategoryResponse
 
 
 class WordCreate(BaseModel):
@@ -10,28 +11,22 @@ class WordCreate(BaseModel):
     examples: List[str] | None = None
 
 
-class WordUpdate(BaseModel):
-    """Для обновления статуса слова при повторении"""
-    rating: str  # again, hard, good, easy
-
 
 class WordResponse(BaseModel):
     id: int
     english: str
     russian: str
-    transcription: str | None = None
-    examples: List[str] | None = None
+    transcription: Optional[str] = None
+    examples: List[str] = []
     user_id: int
-    
-    # Поля для интервального повторения
     strength: int
     interval_days: int
-    next_review: datetime | None = None
-    last_review: datetime | None = None
+    next_review: Optional[datetime] = None
+    last_review: Optional[datetime] = None
     review_count: int
     correct_count: int
     wrong_count: int
-
+    categories: List[CategoryResponse] = []
     model_config = {
         "from_attributes": True
     }
