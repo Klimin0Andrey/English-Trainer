@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English Trainer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <h2>📚 English Trainer</h2>
+    </div>
+    
+    <div class="popup-body">
+      <!-- Состояние: не авторизован -->
+      <div id="unauthorized" class="hidden">
+        <p class="text-center text-gray-600">Для добавления слов необходимо авторизоваться</p>
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="user@example.com">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Пароль</label>
+          <input type="password" id="login-password" placeholder="••••••••">
+        </div>
+        <button id="login-btn" class="btn-primary">Войти</button>
+      </div>
+      
+      <!-- Состояние: авторизован -->
+      <div id="authorized" class="hidden">
+        <p class="text-center" id="user-info">👋 Добро пожаловать, <span id="user-email"></span></p>
+        <div class="form-group">
+          <label for="word-input">Слово для добавления</label>
+          <input type="text" id="word-input" placeholder="Введите слово...">
+        </div>
+        <button id="add-word-btn" class="btn-primary">➕ Добавить слово</button>
+        <button id="logout-btn" class="btn-secondary">Выйти</button>
+      </div>
+      
+      <div id="status-message" class="hidden"></div>
+    </div>
+    
+    <div class="popup-footer">
+      <a href="http://localhost:5173" target="_blank">Открыть приложение</a>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
