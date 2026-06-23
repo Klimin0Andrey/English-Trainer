@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
-import type { Word, WordUpdate } from '../../types';
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useState, useEffect } from 'react';
+import type { Word } from '../../types';
+import type { Category } from '../../api/categories';
+import { categoriesApi } from '../../api/categories';
 
 interface EditWordModalProps {
   word: Word;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (id: number, data: WordUpdate) => Promise<void>;
+  onSave: (id: number, data: Partial<Word>) => Promise<void>;
+  categories?: Category[];
 }
 
 export const EditWordModal: React.FC<EditWordModalProps> = ({
@@ -13,13 +17,26 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  categories = [],
 }) => {
   const [english, setEnglish] = useState(word.english);
   const [russian, setRussian] = useState(word.russian);
-  const [transcription, setTranscription] = useState(word.transcription ?? '');
-  const [examples, setExamples] = useState(word.examples?.join('\n') ?? '');
+  const [transcription, setTranscription] = useState(word.transcription || '');
+  const [examples, setExamples] = useState(word.examples?.join('\n') || '');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setEnglish(word.english);
+      setRussian(word.russian);
+      setTranscription(word.transcription || '');
+      setExamples(word.examples?.join('\n') || '');
+      setSelectedCategoryId(word.categories?.[0]?.id || null);
+      setError('');
+    }
+  }, [isOpen, word]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,10 +47,20 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
       await onSave(word.id, {
         english: english.trim(),
         russian: russian.trim(),
-        // Если поле пустое → null (очищаем транскрипцию)
         transcription: transcription.trim() || null,
-        examples: examples.split('\n').map(e => e.trim()).filter(Boolean),
+        examples: examples.split('\n').filter(e => e.trim()),
       });
+
+      const currentCategoryId = word.categories?.[0]?.id || null;
+      if (selectedCategoryId !== currentCategoryId) {
+        if (currentCategoryId) {
+          await categoriesApi.removeWord(currentCategoryId, word.id);
+        }
+        if (selectedCategoryId) {
+          await categoriesApi.addWord(selectedCategoryId, word.id);
+        }
+      }
+
       onClose();
     } catch (err) {
       setError('Не удалось сохранить изменения');
@@ -46,13 +73,15 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">✏️ Редактировать слово</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            ✏️ Редактировать слово
+          </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
           >
             ✕
           </button>
@@ -61,33 +90,33 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                 Английское слово *
               </label>
               <input
                 type="text"
                 value={english}
                 onChange={(e) => setEnglish(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                 Перевод *
               </label>
               <input
                 type="text"
                 value={russian}
                 onChange={(e) => setRussian(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                 Транскрипция
               </label>
               <input
@@ -95,12 +124,30 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
                 value={transcription}
                 onChange={(e) => setTranscription(e.target.value)}
                 placeholder="/ˈæp.əl/"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Категория
+              </label>
+              <select
+                value={selectedCategoryId ?? ''}
+                onChange={(e) => setSelectedCategoryId(e.target.value ? Number(e.target.value) : null)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="">Без категории</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name} ({cat.word_count})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
                 Примеры (каждый с новой строки)
               </label>
               <textarea
@@ -108,12 +155,12 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
                 onChange={(e) => setExamples(e.target.value)}
                 placeholder="She ate an apple."
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-red-50 text-danger rounded-lg text-sm">
+              <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-sm">
                 {error}
               </div>
             )}
@@ -122,14 +169,14 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-indigo-600 transition disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition disabled:opacity-50"
               >
                 {loading ? 'Сохранение...' : '💾 Сохранить'}
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
               >
                 Отмена
               </button>

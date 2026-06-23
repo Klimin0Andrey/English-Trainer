@@ -35,7 +35,6 @@ export const Quiz: React.FC = () => {
     }
   };
 
-  // Загружаем вопросы при монтировании
   useEffect(() => {
     loadQuestions(questionCount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,11 +111,11 @@ export const Quiz: React.FC = () => {
           <h2 className="text-3xl font-bold mb-4">🎉 Викторина завершена!</h2>
           
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-green-50 rounded-lg p-4">
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
               <div className="text-3xl font-bold text-success">{score.correct}</div>
               <div className="text-sm text-gray-500">Правильно</div>
             </div>
-            <div className="bg-red-50 rounded-lg p-4">
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
               <div className="text-3xl font-bold text-danger">{score.wrong}</div>
               <div className="text-sm text-gray-500">Неправильно</div>
             </div>
@@ -140,13 +139,13 @@ export const Quiz: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">🎯 Викторина</h1>
+        <h1 className="text-3xl font-bold text-text">🎯 Викторина</h1>
         <div className="flex items-center gap-3">
-          <label className="text-sm text-gray-600">Количество:</label>
+          <label className="text-sm text-text-secondary">Количество:</label>
           <select
             value={questionCount}
             onChange={handleCountChange}
-            className="px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-3 py-1 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-text"
             disabled={loading}
           >
             <option value={5}>5</option>
@@ -161,11 +160,11 @@ export const Quiz: React.FC = () => {
       </div>
 
       <div className="mb-6">
-        <div className="flex justify-between text-sm text-gray-500 mb-1">
+        <div className="flex justify-between text-sm text-text-secondary mb-1">
           <span>Вопрос {currentIndex + 1} из {shuffledQuestions.length}</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
             className="bg-primary rounded-full h-2 transition-all duration-300"
             style={{ width: `${progress}%` }}
@@ -174,7 +173,7 @@ export const Quiz: React.FC = () => {
       </div>
 
       <div className="bg-card rounded-xl shadow-lg p-8 mb-6">
-        <h2 className="text-2xl font-semibold text-center mb-6">
+        <h2 className="text-2xl font-semibold text-center mb-6 text-text">
           Как переводится "{currentQuestion.english}"?
         </h2>
 
@@ -183,11 +182,11 @@ export const Quiz: React.FC = () => {
             const isSelected = selectedOption === option;
             const isCorrect = result && option === currentQuestion.correct_answer;
 
-            let bgColor = 'bg-white hover:bg-gray-50';
+            let bgColor = 'bg-card hover:bg-hover';
             if (isSelected && result) {
-              bgColor = isCorrect ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500';
+              bgColor = isCorrect ? 'bg-green-100 dark:bg-green-900/30 border-green-500' : 'bg-red-100 dark:bg-red-900/30 border-red-500';
             } else if (result && option === currentQuestion.correct_answer) {
-              bgColor = 'bg-green-100 border-green-500';
+              bgColor = 'bg-green-100 dark:bg-green-900/30 border-green-500';
             }
 
             return (
@@ -196,10 +195,10 @@ export const Quiz: React.FC = () => {
                 onClick={() => handleSelect(option)}
                 disabled={selectedOption !== null}
                 className={`w-full px-4 py-3 text-left border-2 rounded-lg transition ${bgColor} ${
-                  selectedOption === option ? 'border-primary' : 'border-gray-200'
+                  selectedOption === option ? 'border-primary' : 'border-border'
                 } disabled:cursor-not-allowed`}
               >
-                <span className="font-medium">
+                <span className="font-medium text-text">
                   {String.fromCharCode(97 + index)}. {option}
                 </span>
                 {isSelected && result && (
@@ -213,7 +212,7 @@ export const Quiz: React.FC = () => {
         </div>
 
         {result && (
-          <div className={`mt-4 p-3 rounded-lg ${result.correct ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+          <div className={`mt-4 p-3 rounded-lg ${result.correct ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
             {result.message}
           </div>
         )}
@@ -228,7 +227,7 @@ export const Quiz: React.FC = () => {
         {selectedOption !== null && (
           <button
             onClick={handleNext}
-            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-indigo-600 transition"
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/80 transition"
           >
             {currentIndex < shuffledQuestions.length - 1 ? 'Следующий →' : 'Завершить 🎉'}
           </button>

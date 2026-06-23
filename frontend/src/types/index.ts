@@ -1,3 +1,4 @@
+import type { Category } from '../api/categories';
 export interface User {
   id: number;
   email: string;
@@ -17,6 +18,7 @@ export interface Word {
   review_count: number;
   correct_count: number;
   wrong_count: number;
+  categories?: Category[];
 }
 
 export interface WordCreate {

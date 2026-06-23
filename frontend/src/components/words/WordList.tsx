@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Word, WordUpdate } from '../../types';
+import type { Category } from '../../api/categories';
 import { EditWordModal } from './EditWordModal';
 
 type SortOption = 'newest' | 'oldest' | 'az' | 'za';
@@ -9,9 +10,19 @@ interface WordListProps {
   words: Word[];
   onDelete?: (id: number) => void;
   onUpdate?: (id: number, data: WordUpdate) => Promise<void>;
+  categories?: Category[];
+  selectedCategoryId?: number | null;
+  onCategoryChange?: (id: number | null) => void;
 }
 
-export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate }) => {
+export const WordList: React.FC<WordListProps> = ({
+  words,
+  onDelete,
+  onUpdate,
+  categories = [],
+  selectedCategoryId = null,
+  onCategoryChange,
+}) => {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
@@ -20,7 +31,6 @@ export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate })
   // Фильтрация слов
   const filteredWords = words
     .filter(word => {
-      // Поиск по английскому, русскому и транскрипции
       const searchLower = search.toLowerCase();
       const matchesSearch = 
         word.english.toLowerCase().includes(searchLower) ||
@@ -28,6 +38,12 @@ export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate })
         (word.transcription && word.transcription.toLowerCase().includes(searchLower));
       
       if (!matchesSearch) return false;
+
+      // Фильтр по категории
+      if (selectedCategoryId) {
+        const hasCategory = word.categories?.some(c => c.id === selectedCategoryId);
+        if (!hasCategory) return false;
+      }
 
       // Фильтр по выученности
       if (filterBy === 'learned') {
@@ -42,7 +58,7 @@ export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate })
     .sort((a, b) => {
       switch (sortBy) {
         case 'newest':
-          return b.id - a.id; // предполагаем, что больший id = новее
+          return b.id - a.id;
         case 'oldest':
           return a.id - b.id;
         case 'az':
@@ -71,8 +87,21 @@ export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate })
           placeholder="🔍 Поиск слов..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-text"
+          className="flex-1 min-w-[150px] px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-text"
         />
+
+        <select
+          value={selectedCategoryId ?? ''}
+          onChange={(e) => onCategoryChange?.(e.target.value ? Number(e.target.value) : null)}
+          className="px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-text"
+        >
+          <option value="">📂 Все категории</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name} ({cat.word_count})
+            </option>
+          ))}
+        </select>
 
         <select
           value={sortBy}
@@ -104,6 +133,7 @@ export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate })
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Английский</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Русский</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Транскрипция</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Категория</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Статус</th>
               <th className="px-6 py-3 text-right text-sm font-semibold text-text-secondary">Действия</th>
             </tr>
@@ -117,6 +147,19 @@ export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate })
                   <td className="px-6 py-3 font-medium text-text">{word.english}</td>
                   <td className="px-6 py-3 text-text">{word.russian}</td>
                   <td className="px-6 py-3 text-text-secondary">{word.transcription || '-'}</td>
+                  <td className="px-6 py-3 text-text-secondary">
+                    {word.categories && word.categories.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {word.categories.map((cat) => (
+                          <span key={cat.id} className="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs">
+                            {cat.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-text-secondary text-sm">—</span>
+                    )}
+                  </td>
                   <td className="px-6 py-3">
                     {isLearned ? (
                       <span className="px-2 py-1 bg-success/20 text-success rounded-full text-sm">✅ Выучено</span>
@@ -167,6 +210,7 @@ export const WordList: React.FC<WordListProps> = ({ words, onDelete, onUpdate })
           isOpen={!!editingWord}
           onClose={handleCloseModal}
           onSave={onUpdate}
+          categories={categories} 
         />
       )}
     </div>
