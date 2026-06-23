@@ -9,6 +9,7 @@ class WordCreate(BaseModel):
     russian: str | None = None
     transcription: str | None = None
     examples: List[str] | None = None
+    level: str | None = None
 
 
 
@@ -26,6 +27,7 @@ class WordResponse(BaseModel):
     review_count: int
     correct_count: int
     wrong_count: int
+    level: Optional[str] = None
     categories: List[CategoryResponse] = []
     model_config = {
         "from_attributes": True
@@ -52,3 +54,4 @@ class WordUpdate(BaseModel):
     russian: str | None = None
     transcription: str | None = None
     examples: List[str] | None = None
+    level: Optional[str] = None

@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWords } from '../hooks/useWords';
 import { useCategories } from '../hooks/useCategories';
@@ -10,6 +10,7 @@ export const AddWord: React.FC = () => {
   const { categories } = useCategories();
   const [english, setEnglish] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [level, setLevel] = useState<string>('');  // ← добавить
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -24,15 +25,18 @@ export const AddWord: React.FC = () => {
     setError('');
 
     try {
-      const newWord = await addWord({ english: english.trim() });
-      
-      // Если выбрана категория, добавляем слово в неё
+      const newWord = await addWord({
+        english: english.trim(),
+        level: level || undefined,  // ← передаём уровень
+      });
+
       if (selectedCategoryId && newWord) {
         await categoriesApi.addWord(selectedCategoryId, newWord.id);
       }
-      
+
       setEnglish('');
       setSelectedCategoryId(null);
+      setLevel('');  // ← сбрасываем уровень
       navigate('/words');
     } catch {
       setError('Не удалось добавить слово');
@@ -43,7 +47,7 @@ export const AddWord: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">➕ Добавить новое слово</h1>
+      <h1 className="text-3xl font-bold mb-6 text-text">➕ Добавить новое слово</h1>
 
       <form onSubmit={handleSubmit} className="bg-card rounded-xl shadow-lg p-6">
         <div className="mb-4">
@@ -76,6 +80,23 @@ export const AddWord: React.FC = () => {
                 {cat.name} ({cat.word_count})
               </option>
             ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-semibold text-text-secondary mb-2">
+            Уровень сложности (необязательно)
+          </label>
+          <select
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-text"
+            disabled={loading}
+          >
+            <option value="">Без уровня</option>
+            <option value="beginner">🟢 Beginner</option>
+            <option value="intermediate">🟡 Intermediate</option>
+            <option value="advanced">🔴 Advanced</option>
           </select>
         </div>
 

@@ -1,4 +1,5 @@
 import type { Category } from '../api/categories';
+
 export interface User {
   id: number;
   email: string;
@@ -18,6 +19,7 @@ export interface Word {
   review_count: number;
   correct_count: number;
   wrong_count: number;
+  level: string | null;  // ← добавить
   categories?: Category[];
 }
 
@@ -26,14 +28,15 @@ export interface WordCreate {
   russian?: string;
   transcription?: string;
   examples?: string[];
+  level?: string;  // ← добавить
 }
 
-// Разрешаем null для transcription
 export interface WordUpdate {
   english?: string;
   russian?: string;
-  transcription?: string | null;  // ← теперь null разрешён
+  transcription?: string | null;
   examples?: string[];
+  level?: string | null;
 }
 
 export interface ApiResponse<T> {

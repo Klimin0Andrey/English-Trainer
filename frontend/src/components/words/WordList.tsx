@@ -5,6 +5,7 @@ import { EditWordModal } from './EditWordModal';
 
 type SortOption = 'newest' | 'oldest' | 'az' | 'za';
 type FilterOption = 'all' | 'learned' | 'not_learned';
+type LevelOption = 'all' | 'beginner' | 'intermediate' | 'advanced';
 
 interface WordListProps {
   words: Word[];
@@ -26,9 +27,9 @@ export const WordList: React.FC<WordListProps> = ({
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
+  const [filterLevel, setFilterLevel] = useState<LevelOption>('all');
   const [editingWord, setEditingWord] = useState<Word | null>(null);
 
-  // Фильтрация слов
   const filteredWords = words
     .filter(word => {
       const searchLower = search.toLowerCase();
@@ -39,13 +40,16 @@ export const WordList: React.FC<WordListProps> = ({
       
       if (!matchesSearch) return false;
 
-      // Фильтр по категории
       if (selectedCategoryId) {
         const hasCategory = word.categories?.some(c => c.id === selectedCategoryId);
         if (!hasCategory) return false;
       }
 
-      // Фильтр по выученности
+      // Фильтр по уровню сложности
+      if (filterLevel !== 'all' && word.level !== filterLevel) {
+        return false;
+      }
+
       if (filterBy === 'learned') {
         return word.strength >= 90 && word.interval_days >= 30 && word.correct_count >= 5;
       }
@@ -78,9 +82,20 @@ export const WordList: React.FC<WordListProps> = ({
     setEditingWord(null);
   };
 
+  const getLevelLabel = (level: string | null) => {
+    if (!level) return null;
+    const labels: Record<string, { emoji: string; label: string }> = {
+      beginner: { emoji: '🟢', label: 'Beginner' },
+      intermediate: { emoji: '🟡', label: 'Intermediate' },
+      advanced: { emoji: '🔴', label: 'Advanced' },
+    };
+    const info = labels[level];
+    if (!info) return null;
+    return `${info.emoji} ${info.label}`;
+  };
+
   return (
     <div>
-      {/* Верхняя панель с поиском и фильтрами */}
       <div className="flex flex-wrap gap-3 mb-4">
         <input
           type="text"
@@ -101,6 +116,17 @@ export const WordList: React.FC<WordListProps> = ({
               {cat.name} ({cat.word_count})
             </option>
           ))}
+        </select>
+
+        <select
+          value={filterLevel}
+          onChange={(e) => setFilterLevel(e.target.value as LevelOption)}
+          className="px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-text"
+        >
+          <option value="all">📊 Все уровни</option>
+          <option value="beginner">🟢 Beginner</option>
+          <option value="intermediate">🟡 Intermediate</option>
+          <option value="advanced">🔴 Advanced</option>
         </select>
 
         <select
@@ -125,7 +151,6 @@ export const WordList: React.FC<WordListProps> = ({
         </select>
       </div>
 
-      {/* Таблица слов */}
       <div className="bg-card rounded-lg shadow overflow-hidden">
         <table className="w-full">
           <thead className="bg-hover">
@@ -133,6 +158,7 @@ export const WordList: React.FC<WordListProps> = ({
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Английский</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Русский</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Транскрипция</th>
+              <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Уровень</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Категория</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-text-secondary">Статус</th>
               <th className="px-6 py-3 text-right text-sm font-semibold text-text-secondary">Действия</th>
@@ -141,12 +167,22 @@ export const WordList: React.FC<WordListProps> = ({
           <tbody className="divide-y divide-border">
             {filteredWords.map((word) => {
               const isLearned = word.strength >= 90 && word.interval_days >= 30 && word.correct_count >= 5;
+              const levelDisplay = getLevelLabel(word.level);
               
               return (
                 <tr key={word.id} className="hover:bg-hover transition">
                   <td className="px-6 py-3 font-medium text-text">{word.english}</td>
                   <td className="px-6 py-3 text-text">{word.russian}</td>
                   <td className="px-6 py-3 text-text-secondary">{word.transcription || '-'}</td>
+                  <td className="px-6 py-3">
+                    {levelDisplay ? (
+                      <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">
+                        {levelDisplay}
+                      </span>
+                    ) : (
+                      <span className="text-text-secondary text-sm">—</span>
+                    )}
+                  </td>
                   <td className="px-6 py-3 text-text-secondary">
                     {word.categories && word.categories.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
@@ -210,7 +246,7 @@ export const WordList: React.FC<WordListProps> = ({
           isOpen={!!editingWord}
           onClose={handleCloseModal}
           onSave={onUpdate}
-          categories={categories} 
+          categories={categories}
         />
       )}
     </div>

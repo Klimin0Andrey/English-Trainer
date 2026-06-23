@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ThemeToggle } from './ThemeToggle';  // ← добавить импорт
+import { ThemeToggle } from './ThemeToggle';
+import { PageTransition } from './PageTransition';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -31,7 +33,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link to="/quiz" className="hover:text-gray-200 transition">🎯 Викторина</Link>
               <Link to="/import" className="hover:text-gray-200 transition">📝 Импорт</Link>
               <Link to="/add" className="hover:text-gray-200 transition">+ Добавить</Link>
-              <ThemeToggle />  {/* ← добавить */}
+              <ThemeToggle />
               {user && (
                 <>
                   <span className="text-sm text-gray-200">
@@ -51,7 +53,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        {children}
+        <PageTransition key={location.pathname}>
+          {children}
+        </PageTransition>
       </main>
 
       <footer className="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 py-4 transition-colors">

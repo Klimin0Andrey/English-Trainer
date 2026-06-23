@@ -5,7 +5,7 @@ from sqlalchemy import String, ForeignKey, JSON, Integer, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.models.category import word_category  # импортируем таблицу связи
+from app.models.category import word_category
 
 if TYPE_CHECKING:
     from app.models.user import User
@@ -35,6 +35,9 @@ class Word(Base):
     review_count: Mapped[int] = mapped_column(Integer, default=0)
     correct_count: Mapped[int] = mapped_column(Integer, default=0)
     wrong_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    # Уровень сложности
+    level: Mapped[str] = mapped_column(String(20), nullable=True, default=None)
 
     user: Mapped["User"] = relationship(back_populates="words")
     categories: Mapped[list["Category"]] = relationship(
