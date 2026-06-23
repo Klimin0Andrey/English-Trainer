@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';  // ← добавить
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { Layout } from './components/common/Layout';
 import { Dashboard } from './pages/Dashboard';
@@ -13,77 +14,77 @@ import { TextImport } from './pages/TextImport';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Публичные маршруты (доступны без авторизации) */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+    <ThemeProvider>  {/* ← добавить */}
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Защищённые маршруты (требуют авторизации) */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/words"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Words />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/add"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <AddWord />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/study"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Study />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/quiz"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Quiz />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/import"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <TextImport />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/words"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Words />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/add"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <AddWord />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/study"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Study />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/quiz"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Quiz />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/import"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <TextImport />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -6,13 +6,75 @@
   --color-success: #22c55e;
   --color-danger: #ef4444;
   --color-warning: #f59e0b;
+}
+
+/* Светлая тема (по умолчанию) */
+:root {
   --color-background: #f8fafc;
   --color-card: #ffffff;
   --color-text: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-border: #e2e8f0;
+  --color-hover: #f1f5f9;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Тёмная тема */
+.dark {
+  --color-background: #0f172a;
+  --color-card: #1e293b;
+  --color-text: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-border: #334155;
+  --color-hover: #334155;
+  --color-shadow: rgba(0, 0, 0, 0.4);
 }
 
 body {
-  @apply bg-background text-text;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+}
+
+/* Применяем переменные к компонентам */
+.bg-background {
+  background-color: var(--color-background);
+}
+
+.bg-card {
+  background-color: var(--color-card);
+}
+
+.text-text {
+  color: var(--color-text);
+}
+
+.text-text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.border-border {
+  border-color: var(--color-border);
+}
+
+.bg-hover {
+  background-color: var(--color-hover);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 6px var(--color-shadow);
+}
+
+#root {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0 16px;
 }
 
 /* Анимация для карточек */
@@ -41,4 +103,15 @@ body {
 
 .flip-card-back {
   transform: rotateY(180deg);
+}
+
+h1, h2, h3 {
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  #root {
+    padding: 0 8px;
+  }
 }

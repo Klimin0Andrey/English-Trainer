@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ThemeToggle } from './ThemeToggle';  // ← добавить импорт
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <header className="bg-primary text-white shadow-lg">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -30,6 +31,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link to="/quiz" className="hover:text-gray-200 transition">🎯 Викторина</Link>
               <Link to="/import" className="hover:text-gray-200 transition">📝 Импорт</Link>
               <Link to="/add" className="hover:text-gray-200 transition">+ Добавить</Link>
+              <ThemeToggle />  {/* ← добавить */}
               {user && (
                 <>
                   <span className="text-sm text-gray-200">
@@ -52,7 +54,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
 
-      <footer className="bg-gray-200 text-gray-600 py-4">
+      <footer className="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 py-4 transition-colors">
         <div className="container mx-auto px-4 text-center text-sm">
           English Trainer © 2026
         </div>
