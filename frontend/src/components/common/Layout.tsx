@@ -28,6 +28,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link to="/words" className="hover:text-gray-200 transition">Словарь</Link>
               <Link to="/study" className="hover:text-gray-200 transition">Карточки</Link>
               <Link to="/quiz" className="hover:text-gray-200 transition">🎯 Викторина</Link>
+              <Link to="/import" className="hover:text-gray-200 transition">📝 Импорт</Link>
               <Link to="/add" className="hover:text-gray-200 transition">+ Добавить</Link>
               {user && (
                 <>

@@ -9,6 +9,7 @@ import { Study } from './pages/Study';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Quiz } from './pages/Quiz';
+import { TextImport } from './pages/TextImport';
 
 function App() {
   return (
@@ -66,6 +67,16 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Quiz />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/import"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <TextImport />
                 </Layout>
               </ProtectedRoute>
             }

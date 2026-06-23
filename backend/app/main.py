@@ -5,6 +5,7 @@ from app.api.words import router as words_router
 from app.api.auth import router as auth_router
 from app.api.review import router as review_router 
 from app.api.quiz import router as quiz_router
+from app.api.text_import import router as text_import_router
 from sqlalchemy import text
 
 from app.db.database import engine
@@ -25,6 +26,7 @@ app.include_router(words_router)
 app.include_router(auth_router)
 app.include_router(review_router)
 app.include_router(quiz_router)
+app.include_router(text_import_router)
 
 
 @app.get("/health")
