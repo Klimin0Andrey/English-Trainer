@@ -1,6 +1,6 @@
 // Фоновый скрипт для обработки контекстного меню и запросов
 
-const API_URL = 'http://localhost:8000';
+const API_URL = 'https://english-trainer-rg8f.onrender.com';  // ← ИЗМЕНИЛ
 
 // Создаём контекстное меню при установке
 chrome.runtime.onInstalled.addListener(() => {
