@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://english-trainer-rg8f.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },
