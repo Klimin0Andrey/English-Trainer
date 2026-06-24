@@ -13,13 +13,15 @@ from app.db.database import engine
 
 app = FastAPI()
 
-# CORS - правильная настройка для расширения
+# CORS - правильная настройка
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "chrome-extension://bmcankckglngmlelklmdnenhpadlbdbb",  # разрешаем расширениям Chrome
+        "http://10.0.0.1:5173",  # ← ДОБАВИТЬ (твой локальный IP)
+        "https://english-trainer-frontend.onrender.com",  # ← ДОБАВИТЬ (продакшн-фронтенд)
+        "chrome-extension://bmcankckglngmlelklmdnenhpadlbdbb",
     ],
     allow_credentials=False,
     allow_methods=["*"],
