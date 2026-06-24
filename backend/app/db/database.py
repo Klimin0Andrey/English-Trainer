@@ -6,7 +6,9 @@ from app.core.config import settings
 
 engine = create_engine(
     settings.database_url,
-    echo=True
+    echo=True,
+    pool_pre_ping=True,   # Проверка соединения перед использованием
+    pool_recycle=300,     # Пересоздавать соединение каждые 5 минут
 )
 
 SessionLocal = sessionmaker(
